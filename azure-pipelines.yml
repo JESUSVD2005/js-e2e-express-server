@@ -1,7 +1,4 @@
-# Node.js
-# Build a general Node.js project with npm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+# Pipeline para Node.js en Azure DevOps
 
 trigger:
 - main
@@ -10,12 +7,31 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+# Asegura que el repositorio se descargue
+- checkout: self
+
+# Instalar la versión de Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Install Node.js'
 
+# Instalar dependencias y compilar
 - script: |
     npm install
     npm run build
   displayName: 'npm install and build'
+
+# (Opcional) Validación – evitar fallos silenciosos
+- script: |
+    node -v
+    npm -v
+  displayName: 'Verify Node.js & npm versions'
+
+# (Opcional) Publicar artefactos de la carpeta build
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.SourcesDirectory)/build'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: 'Publish Build Artifacts'
