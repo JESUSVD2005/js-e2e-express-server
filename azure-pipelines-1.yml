@@ -70,3 +70,21 @@ stages:
               appName: 'RecursosWebs'          # Nombre del App Service de tu imagen
               package: '$(Pipeline.Workspace)/nodejs-app'
               # runtimeStack: 'NODE|20-lts' # Opcional: especificar la versión de Node.js en el App Service
+              # ... (código anterior)
+
+- stage: Deploy
+  displayName: 'Deploy to Azure App Service'
+  dependsOn: Build
+  condition: succeeded() 
+  
+  jobs:
+  - deployment: DeploymentJob
+    displayName: 'Deployment Job'
+    
+    # ***** CAMBIO CLAVE AQUÍ *****
+    environment: 'Desarrollo' # <<--- ¡USA EL NOMBRE DEL ENTORNO QUE CREASTE!
+
+    strategy:
+      runOnce:
+        deploy:
+# ... (siguientes pasos de la tarea AzureWebApp@1)
