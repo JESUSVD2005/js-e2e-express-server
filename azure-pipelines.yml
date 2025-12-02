@@ -1,88 +1,26 @@
-# azure-pipelines.yml
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
 
+trigger:
+- main
 
-# 1. Stage de Construcción (Build)
-stages:
-- stage: Build
-  displayName: 'Build and Test Node.js App'
-  jobs:
-  - job: BuildJob
-    displayName: 'Build, Test, and Publish Artifacts'
-    pool:
-      vmImage: ubuntu-latest
-    
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '20.x'
-      displayName: 'Install Node.js 20.x'
+pool:
+  vmImage: ubuntu-latest
 
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
 
-    - script: |
-        npm install
-        npm run build 
-      displayName: 'npm install and build'
-
-
-    - script: |
-        npm test
-      displayName: 'Run Tests'
-
-
-    - task: ArchiveFiles@2
-      inputs:
-        rootFolderOrFile: 'dist' # Asegúrate de que 'dist' sea tu carpeta de build
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-        replaceExistingArchive: true
-      displayName: 'Archive Build Files'
-
-
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop' # Nombre del artefacto para el despliegue
-        publishLocation: 'Container'
-      displayName: 'Publish Build Artifacts (drop)'
-
-
-# --- FIN DE LA ETAPA DE CONSTRUCCIÓN ---
-# 2. Stage de Despliegue (Deployment)
-
-
-- stage: DeployToStaging
-  displayName: 'Deploy App to Staging Environment'
-  dependsOn: Build # Esta etapa SOLO se ejecuta si la etapa 'Build' fue exitosa
-  condition: succeeded() 
-  
-  jobs:
-  - deployment: DeploymentJob
-    displayName: 'Deploy to Azure App Service'
-    environment: 'Staging' # Nombre opcional para un Environment de Azure DevOps
-
-
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          
-          # Descarga el artefacto 'drop' que se generó en la etapa anterior
-          - task: DownloadBuildArtifacts@1
-            inputs:
-              artifactName: 'drop'
-              downloadPath: '$(System.DefaultWorkingDirectory)'
-            displayName: 'Download Build Artifacts'
-
-
-          # Tarea clave: Despliega el contenido en Azure App Service
-          - task: AzureWebAppDeployment@1
-            displayName: 'Deploy to Azure App Service'
-            inputs:
-              # ******** Aquí se utiliza el azureSubscription ********
-              azureSubscription: 'connection2260'
-              appName: 'datos_22601'
-              package: '$(System.DefaultWorkingDirectory)/drop/$(Build.BuildId).zip'
-              # Opcional: Especificar la versión de Node.js en el App Service (si es necesaria)
-              # appType: 'webAppLinux' 
-              # runtimeStack: 'NODE|20-lts'
+- script: |
+    npm install
+    npm run build
+    npm test
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/TEST-*.xml'
+  displayName: 'npm install and build'
