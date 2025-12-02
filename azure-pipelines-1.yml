@@ -66,7 +66,7 @@ stages:
             displayName: 'Deploy to Azure App Service'
             inputs:
               # ******** TU SERVICE CONNECTION *********
-              azureSubscription: 'NewProject2960' # Nombre de la conexión de tu imagen
-              appName: 'utscmaestro2960'          # Nombre del App Service de tu imagen
+              azureSubscription: 'inges7c' # Nombre de la conexión de tu imagen
+              appName: 'RecursosWebs'          # Nombre del App Service de tu imagen
               package: '$(Pipeline.Workspace)/nodejs-app'
               # runtimeStack: 'NODE|20-lts' # Opcional: especificar la versión de Node.js en el App Service
