@@ -17,6 +17,6 @@ stages:
     - task: AzureWebApp@1
       displayName: 'Deploy Web App'
       inputs:
-        azureSubscription: 'losinges7c' # <--- ¡Aquí debes poner la conexión AzureRM!
+        azureSubscription: 'LosInges7C' # <--- ¡Aquí debes poner la conexión AzureRM!
         appName: 'datos_22601'
         package: '$(Build.ArtifactStagingDirectory)'
